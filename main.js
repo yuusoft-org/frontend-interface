@@ -5,6 +5,12 @@ import projects from './pages/projects/projects.js'
 import project from './pages/project/project.js'
 import sidebar from './pages/sidebar/sidebar.js'
 import resources from './pages/resources/resources.js'
+import backgrounds from './pages/backgrounds/backgrounds.js'
+import cgs from './pages/cgs/cgs.js'
+import scenes from './pages/scenes/scenes.js';
+import sceneEditor from './pages/sceneEditor/sceneEditor.js';
+
+import fileExplorer from './components/fileExplorer/fileExplorer.js'
 
 import { init } from 'snabbdom/build/init.js'
 import { classModule } from 'snabbdom/build/modules/class.js'
@@ -31,48 +37,35 @@ const deps = {
   router: new WebRouter(),
 }
 
-const ProjectsComponent = createMyComponent({
-  createStore: projects.createStore,
-  template: projects.view.template,
-  refs: projects.view.refs,
-  patch,
-  handlers: projects.handlers,
-}, deps)
+const createComponentFromPage = (page) => {
+  return createMyComponent({
+    createStore: page.createStore,
+    template: page.view.template,
+    refs: page.view.refs,
+    patch,
+    handlers: page.handlers,
+  }, deps)
+}
 
-const AppComponent = createMyComponent({
-  createStore: app.createStore,
-  template: app.view.template,
-  refs: app.view.refs,
-  patch,
-  handlers: app.handlers,
-}, deps)
-
-const ProjectComponent = createMyComponent({
-  createStore: project.createStore,
-  template: project.view.template,
-  refs: project.view.refs,
-  patch,
-  handlers: project.handlers,
-}, deps)
-
-const SidebarComponent = createMyComponent({
-  createStore: sidebar.createStore,
-  template: sidebar.view.template,
-  refs: sidebar.view.refs,
-  patch,
-  handlers: sidebar.handlers,
-}, deps)
-
-const ResourcesComponent = createMyComponent({
-  createStore: resources.createStore,
-  template: resources.view.template,
-  refs: resources.view.refs,
-  patch,
-  handlers: resources.handlers,
-}, deps)
+const ProjectsComponent = createComponentFromPage(projects)
+const AppComponent = createComponentFromPage(app)
+const ProjectComponent = createComponentFromPage(project)
+const SidebarComponent = createComponentFromPage(sidebar)
+const ResourcesComponent = createComponentFromPage(resources)
+const BackgroundsComponent = createComponentFromPage(backgrounds)
+const CgsComponent = createComponentFromPage(cgs)
+const ScenesComponent = createComponentFromPage(scenes)
+const SceneEditorComponent = createComponentFromPage(sceneEditor)
 
 customElements.define('projects-component', ProjectsComponent);
 customElements.define('app-component', AppComponent);
 customElements.define('project-component', ProjectComponent);
 customElements.define('sidebar-component', SidebarComponent);
 customElements.define('resources-component', ResourcesComponent);
+customElements.define('backgrounds-component', BackgroundsComponent);
+customElements.define('cgs-component', CgsComponent);
+customElements.define('scenes-component', ScenesComponent);
+customElements.define('scene-editor-component', SceneEditorComponent);
+
+const FileExplorerComponent = createComponentFromPage(fileExplorer)
+customElements.define('file-explorer-component', FileExplorerComponent);

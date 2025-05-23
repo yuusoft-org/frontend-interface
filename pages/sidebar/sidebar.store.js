@@ -12,7 +12,7 @@ const INITIAL_STATE = Object.freeze({
     },
     {
       title: "Scenes",
-      slug: "/item3",
+      slug: "/projects/projectid/scenes",
     },
     {
       title: "Settings",

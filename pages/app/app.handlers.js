@@ -6,9 +6,8 @@ const handleOnMount = (deps) => {
 }
 
 const handleRedirect = (payload, deps) => {
-  console.log('handleRedirect', payload);
-  deps.router.redirect(payload.path, payload.payload);
   deps.store.setCurrentRoute(payload.path);
+  deps.router.redirect(payload.path, payload.payload);
   deps.render();
 }
 
@@ -25,6 +24,7 @@ const subscriptions = (deps) => {
     subject.pipe(
       filter(({ action, payload }) => action === 'redirect'),
       tap(({ action, payload }) => {
+        console.log('111111111111111111')
         deps.handlers.handleRedirect(payload, deps);
       })
     ),

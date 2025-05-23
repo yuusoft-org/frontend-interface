@@ -22,3 +22,11 @@ template:
             - project-component: []
           'currentRoutePattern == "/projects/:projectId/resources"':
             - resources-component: []
+          'currentRoutePattern == "/projects/:projectId/cgs"':
+            - cgs-component: []
+          'currentRoutePattern == "/projects/:projectId/backgrounds"':
+            - backgrounds-component: []
+          'currentRoutePattern == "/projects/:projectId/scenes"':
+            - scenes-component: []
+          'currentRoutePattern == "/projects/:projectId/scenes/:sceneId/editor"':
+            - scene-editor-component: []

@@ -1,0 +1,15 @@
+dataSchema:
+  type: object
+  properties: {}
+
+refs:
+  fileexplorer:
+    eventListeners:
+      targetchanged:
+        required: true
+        handler: handleTargetChanged
+
+template:
+  - rtgl-view w=f h=f p=m:
+    - rtgl-text s=h2: Backgrounds
+    - file-explorer-component#fileexplorer: []

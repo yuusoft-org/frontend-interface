@@ -35,6 +35,7 @@ export class BaseComponent extends HTMLElement {
   handlers;
   transformedHandlers = {};
   refs;
+  refIds = {};
   patch;
   _unmountCallback;
   _oldVNode;
@@ -59,20 +60,31 @@ export class BaseComponent extends HTMLElement {
     // TODO don't include onmount, subscriptions, etc in transformedHandlers
     Object.keys(this.handlers || {}).forEach((key) => {
       this.transformedHandlers[key] = (payload) => {
-        const result = this.handlers[key](payload, this.deps);
-        // this.render();
+        const result = this.handlers[key](payload, {
+          ...this.deps,
+          refIds: this.refIds,
+          dispatchEvent: this.dispatchEvent,
+        });
         return result;
       };
     });
 
     if (this.handlers?.subscriptions) {
       this.unsubscribeAll = subscribeAll(
-        this.handlers.subscriptions(this.deps)
+        this.handlers.subscriptions({
+          ...this.deps,
+          refIds: this.refIds,
+          dispatchEvent: this.dispatchEvent,
+        })
       );
     }
 
     if (this.handlers?.handleOnMount) {
-      this._unmountCallback = this.handlers?.handleOnMount(this.deps);
+      this._unmountCallback = this.handlers?.handleOnMount({
+        ...this.deps,
+        refIds: this.refIds,
+        dispatchEvent: this.dispatchEvent,
+      });
     }
 
     requestAnimationFrame(() => {
@@ -108,6 +120,23 @@ export class BaseComponent extends HTMLElement {
         this.refs,
         this.transformedHandlers
       );
+
+      console.log('4444444444444 vDom', vDom)
+
+      // parse through vDom and recursively find all elements with id
+      const ids = {};
+      const findIds = (vDom) => {
+        if (vDom.data.attrs && vDom.data.attrs.id) {
+          ids[vDom.data.attrs.id] = vDom;
+        }
+        if (vDom.children) {
+          vDom.children.forEach(findIds);
+        }
+      };
+      findIds(vDom);
+      this.refIds = ids;
+      console.log('ids', ids)
+
       const parseTime = performance.now() - parseStart;
       console.log(`parseView took ${parseTime.toFixed(2)}ms`);
 

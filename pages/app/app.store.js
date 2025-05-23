@@ -1,25 +1,40 @@
 import { transformStore } from "../../framework.js";
 
 const INITIAL_STATE = Object.freeze({
-  currentRoute: '/projects',
+  currentRoute: "/projects",
 });
 
 const selectShowSidebar = (state) => {
   const currentRoutePattern = selectCurrentRoutePattern(state);
-  const routesWithNavBar = ["/projects/:projectId", "/projects/:projectId/resources"];
+  const routesWithNavBar = [
+    "/projects/:projectId",
+    "/projects/:projectId/resources",
+    "/projects/:projectId/cgs",
+    "/projects/:projectId/backgrounds",
+    "/projects/:projectId/scenes",
+    "/projects/:projectId/scenes/:sceneId/editor",
+  ];
   console.log({
     currentRoutePattern,
     routesWithNavBar,
-  })
+  });
   return routesWithNavBar.includes(currentRoutePattern);
-}
+};
 
 const selectCurrentRoutePattern = (state) => {
-  const routePatterms = ["/projects", "/projects/:projectId", "/projects/:projectId/resources"]
+  const routePatterms = [
+    "/projects",
+    "/projects/:projectId",
+    "/projects/:projectId/resources",
+    "/projects/:projectId/cgs",
+    "/projects/:projectId/backgrounds",
+    "/projects/:projectId/scenes",
+    "/projects/:projectId/scenes/:sceneId/editor",
+  ];
   const currentRoute = state.currentRoute;
   const matchPaths = (path, pattern) => {
-    const pathParts = path.split('/');
-    const patternParts = pattern.split('/');
+    const pathParts = path.split("/");
+    const patternParts = pattern.split("/");
 
     if (pathParts.length !== patternParts.length) {
       return false;
@@ -28,17 +43,19 @@ const selectCurrentRoutePattern = (state) => {
     return pathParts.every((part, index) => {
       const patternPart = patternParts[index];
       // Check if the pattern part is a parameter (e.g., :id or {paramName})
-      return patternPart === part || patternPart.startsWith(':');
+      return patternPart === part || patternPart.startsWith(":");
     });
-  }
-  const routePattern = routePatterms.find(pattern => matchPaths(currentRoute, pattern));
+  };
+  const routePattern = routePatterms.find((pattern) =>
+    matchPaths(currentRoute, pattern)
+  );
   return routePattern;
-}
+};
 
 const setCurrentRoute = (state, payload) => {
   state.currentRoute = payload;
   return state;
-}
+};
 
 const toViewData = (state) => {
   return {
@@ -46,7 +63,7 @@ const toViewData = (state) => {
     currentRoutePattern: selectCurrentRoutePattern(state),
     showSidebar: selectShowSidebar(state),
   };
-}
+};
 
 const createStore = (initialState = INITIAL_STATE) => {
   return {
@@ -59,7 +76,7 @@ const createStore = (initialState = INITIAL_STATE) => {
     selectors: {
       toViewData,
       selectCurrentRoutePattern,
-    }
+    },
   };
 };
 

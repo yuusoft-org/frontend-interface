@@ -6,25 +6,31 @@ import { createServer } from 'vite'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 
-watch(
-  './pages',
-  { recursive: true },
-  async (event, filename) => {
-    console.log(`Detected ${event} in ${filename}`);
-    if (filename) {
-      try {
-        if (filename.endsWith('.view.yaml')) {
-          await yamlToJs(path.join('./pages', filename));
-        } else if (filename.endsWith('.js')) {
-          await esbuildBuild();
+const setupWatcher = (directory) => {
+  watch(
+    directory,
+    { recursive: true },
+    async (event, filename) => {
+      console.log(`Detected ${event} in ${directory}/${filename}`);
+      if (filename) {
+        try {
+          if (filename.endsWith('.view.yaml')) {
+            await yamlToJs(path.join(directory, filename));
+          } else if (filename.endsWith('.js')) {
+            await esbuildBuild();
+          }
+        } catch (error) {
+          console.error(`Error processing ${filename}:`, error);
+          // Keep the watcher running
         }
-      } catch (error) {
-        console.error(`Error processing ${filename}:`, error);
-        // Keep the watcher running
       }
-    }
-  },
-);
+    },
+  );
+};
+
+// Set up watchers for multiple directories
+setupWatcher('./pages');
+setupWatcher('./components');
 
 async function startViteServer() {
   try {

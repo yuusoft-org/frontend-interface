@@ -10,7 +10,7 @@ export const parseView = (template, data, refs, handlers) => {
     // Create a clean container without additional attributes
     const childNodes = createVirtualDom(flattenedResult, refs, handlers);
     
-    const vdom = h('div.container', {}, childNodes);
+    const vdom = h('div', { style: { display: 'contents' } }, childNodes);
     return vdom;
   } catch (error) {
     console.error('Error in parseView:', error);
@@ -241,7 +241,7 @@ export const createVirtualDom = (items, refs = {}, handlers = {}) => {
                     });
 
                     const bestMatchRefKey = matchingRefKeys[0];
-                    
+
                     if (refs[bestMatchRefKey] && refs[bestMatchRefKey].eventListeners) {
                         const eventListeners = refs[bestMatchRefKey].eventListeners;
                         Object.entries(eventListeners).forEach(([eventType, eventConfig]) => {

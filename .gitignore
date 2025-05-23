@@ -1,0 +1,3 @@
+/pages/**/*.view.js
+/node_modules
+/public/main.js

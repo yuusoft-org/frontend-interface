@@ -1,0 +1,8 @@
+dataSchema:
+  type: object
+  properties: {}
+
+refs: {}
+
+template:
+  - rtgl-view w=f h=f p=m:

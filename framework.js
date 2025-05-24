@@ -39,7 +39,6 @@ export class BaseComponent extends HTMLElement {
   patch;
   _unmountCallback;
   _oldVNode;
-  // globalStore;
   deps;
 
   get viewData() {
@@ -47,44 +46,35 @@ export class BaseComponent extends HTMLElement {
   }
 
   connectedCallback() {
+
     if (!this.renderTarget.parentNode) {
       this.appendChild(this.renderTarget);
     }
     this.style.display = "contents";
 
-    // const deps = {
-    //   render: this.render,
-    //   store: this.store,
-    // }
+    const deps = {
+      ...this.deps,
+      refIds: this.refIds,
+      getRefIds: () => this.refIds,
+      dispatchEvent: this.dispatchEvent.bind(this),
+    }
 
     // TODO don't include onmount, subscriptions, etc in transformedHandlers
     Object.keys(this.handlers || {}).forEach((key) => {
       this.transformedHandlers[key] = (payload) => {
-        const result = this.handlers[key](payload, {
-          ...this.deps,
-          refIds: this.refIds,
-          dispatchEvent: this.dispatchEvent,
-        });
+        const result = this.handlers[key](payload, deps);
         return result;
       };
     });
 
     if (this.handlers?.subscriptions) {
       this.unsubscribeAll = subscribeAll(
-        this.handlers.subscriptions({
-          ...this.deps,
-          refIds: this.refIds,
-          dispatchEvent: this.dispatchEvent,
-        })
+        this.handlers.subscriptions(deps)
       );
     }
 
     if (this.handlers?.handleOnMount) {
-      this._unmountCallback = this.handlers?.handleOnMount({
-        ...this.deps,
-        refIds: this.refIds,
-        dispatchEvent: this.dispatchEvent,
-      });
+      this._unmountCallback = this.handlers?.handleOnMount(deps);
     }
 
     requestAnimationFrame(() => {

@@ -62,7 +62,8 @@ const handleItemClick = (e, deps) => {
 };
 
 const handleItemMouseDown = (e, deps) => {
-  const { store, refIds } = deps;
+  const { store, getRefIds } = deps;
+  const refIds = getRefIds();
 
   const itemRects = Object.keys(refIds).reduce((acc, key) => {
     const ref = refIds[key];
@@ -86,15 +87,13 @@ const handleWindowMouseUp = (e, deps) => {
   }
 
   store.stopDragging();
-  // check if target changed
 
-  console.log('dispatchEvent target changed');
+  render();
   dispatchEvent(new CustomEvent("targetchanged", {
     detail: {
       target: store.selectTargetDragIndex(),
     },
   }));
-  render();
 };
 
 const handleWindowMouseMove = (e, deps) => {

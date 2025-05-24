@@ -37,7 +37,7 @@ export default {
               "rtgl-text": "File Explorer"
             },
             {
-              "rtgl-view#container w=f h=f style=\"position: relative;\"": [
+              "rtgl-view w=f h=f style=\"position: relative;\"": [
                 {
                   "$map": {
                     "$eval": "items"

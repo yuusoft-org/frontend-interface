@@ -14,28 +14,14 @@ dataSchema:
 refs:
   item-*:
     eventListeners:
-      # click:
-      #   required: true
-      #   handler: handleItemClick
       mousedown:
         required: true
         handler: handleItemMouseDown
-      # mousemove:
-      #   required: true
-      #   handler: handleItemMouseMove
-      # mouseup:
-      #   required: true
-  # container:
-  #   eventListeners:
-  #     mousemove:
-  #       required: true
-  #       handler: handleContainerMouseMove
-
 template:
   - rtgl-view w=f h=100vh p=m w=200: 
     - rtgl-view w=f h=f g=s:
       - rtgl-text: File Explorer
-      - 'rtgl-view#container w=f h=f style="position: relative;"':
+      - 'rtgl-view w=f h=f style="position: relative;"':
         - $map: { $eval: items }
           each(v,k):
             - rtgl-view#item-${v.id} w=f h=f p=m h=32 w=f cur=p av=c:

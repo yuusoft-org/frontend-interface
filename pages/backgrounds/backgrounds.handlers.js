@@ -1,13 +1,16 @@
 const handleOnMount = (deps) => {
-
-
+  const { store, localData } = deps;
+  store.setItems(localData.backgrounds.toJSONFlat())
+  deps.render();
 }
+
 const handleTargetChanged = (payload, deps) => {
-  deps.store.addItem({
-    id: `df-${Date.now()}`,
-    name: 'sdf',
-    level: 1
+  const { store, localData } = deps;
+  localData.backgrounds.createItem('_root', {
+    name: 'New Item',
+    level: 0
   })
+  store.setItems(localData.backgrounds.toJSONFlat())
   deps.render();
 }
 

@@ -30,6 +30,12 @@ const patch = init([
   attributesModule,
 ]); // Reverted to default DOM API
 
+const backgroundsData = createAutoMergeData()
+backgroundsData.createItem('_root', {
+  name: 'Initial Item',
+  level: 0
+})
+
 const deps = {
   globalStore: {},
   subject: new CustomSubject(),
@@ -37,7 +43,7 @@ const deps = {
   BaseComponent,
   router: new WebRouter(),
   localData: {
-    backgrounds: createAutoMergeData()
+    backgrounds: backgroundsData
   }
 }
 

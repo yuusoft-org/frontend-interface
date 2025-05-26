@@ -18,6 +18,28 @@ export default {
       }
     }
   },
+  "propsSchema": {
+    "type": "object",
+    "properties": {
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            },
+            "level": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    }
+  },
   "refs": {
     "item-*": {
       "eventListeners": {

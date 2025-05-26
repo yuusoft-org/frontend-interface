@@ -1,4 +1,5 @@
 import { createMyComponent, BaseComponent } from './framework.js'
+import { createAutoMergeData } from './automerge/sample.js'
 
 import app from './pages/app/app.js'
 import projects from './pages/projects/projects.js'
@@ -35,13 +36,18 @@ const deps = {
   httpClient: {},
   BaseComponent,
   router: new WebRouter(),
+  localData: {
+    backgrounds: createAutoMergeData()
+  }
 }
 
 const createComponentFromPage = (page) => {
+  console.log('page.view.propsSchema', page.view.propsSchema)
   return createMyComponent({
     createStore: page.createStore,
     template: page.view.template,
     refs: page.view.refs,
+    propsSchema: page.view.propsSchema,
     patch,
     handlers: page.handlers,
   }, deps)
@@ -69,3 +75,4 @@ customElements.define('scene-editor-component', SceneEditorComponent);
 
 const FileExplorerComponent = createComponentFromPage(fileExplorer)
 customElements.define('file-explorer-component', FileExplorerComponent);
+

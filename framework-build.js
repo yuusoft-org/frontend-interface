@@ -1,6 +1,8 @@
 import { readdirSync, statSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
+
+
 import { load as loadYaml } from "js-yaml";
 import esbuild from "esbuild";
 
@@ -49,6 +51,10 @@ export const esbuildBuild = async () => {
       sourcemap: false,
       outfile: "./public/main.js",
       format: "esm",
+      loader: {
+        '.wasm': 'binary',
+      },
+      // target: 'es2020',
     });
   } catch (error) {
     console.error('esbuild error:', error);

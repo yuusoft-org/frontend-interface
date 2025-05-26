@@ -76,13 +76,7 @@ const INITIAL_STATE = Object.freeze({
 });
 
 const selectResourceRoute = (state, resourceId, projectId) => {
-  console.log('selectResourceRoute', {
-    state, resourceId, projectId
-  })
   const resources = state.assets.concat(state.ui).concat(state.system);
-  console.log({
-    resources
-  })
   const resource = resources.find((resource) => resource.id === resourceId);
   if (!resource) {
     throw new Error(`Resource ${resourceId} not found`);
@@ -90,7 +84,7 @@ const selectResourceRoute = (state, resourceId, projectId) => {
   return resource.route.replace(":projectId", projectId);
 };
 
-const toViewData = (state) => {
+const toViewData = ({ state }) => {
   return state;
 };
 
@@ -105,4 +99,4 @@ const createStore = (initialState = INITIAL_STATE) => {
   };
 };
 
-export default transformStore(createStore());
+export default transformStore(createStore);

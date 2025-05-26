@@ -21,6 +21,51 @@ const subscribeAll = (observables) => {
   };
 };
 
+/**
+ * Creates a read-only proxy object that only allows access to specified properties from the source object
+ * @param {Object} source - The source object to create a proxy from
+ * @param {string[]} allowedKeys - Array of property names that are allowed to be accessed
+ * @returns {Proxy} A read-only proxy object that only allows access to the specified properties
+ * @throws {Error} When attempting to modify the proxy object
+ */
+function createProps(source, allowedKeys) {
+  // return source;
+  const allowed = new Set(allowedKeys);
+  return new Proxy({}, {
+    get(_, prop) {
+      if (allowed.has(prop)) {
+        return source[prop];
+      }
+      return undefined;
+    },
+    set() {
+      throw new Error('Cannot assign to read-only proxy');
+    },
+    defineProperty() {
+      throw new Error('Cannot define properties on read-only proxy');
+    },
+    deleteProperty() {
+      throw new Error('Cannot delete properties from read-only proxy');
+    },
+    has(_, prop) {
+      return allowed.has(prop);
+    },
+    ownKeys() {
+      return [...allowed];
+    },
+    getOwnPropertyDescriptor(_, prop) {
+      if (allowed.has(prop)) {
+        return {
+          configurable: true,
+          enumerable: true,
+          get: () => source[prop]
+        };
+      }
+      return undefined;
+    }
+  });
+}
+
 export class BaseComponent extends HTMLElement {
   constructor() {
     super();
@@ -31,6 +76,8 @@ export class BaseComponent extends HTMLElement {
   }
 
   store;
+  props;
+  propsSchema;
   template;
   handlers;
   transformedHandlers = {};
@@ -42,11 +89,14 @@ export class BaseComponent extends HTMLElement {
   deps;
 
   get viewData() {
-    return this.store.toViewData(this.deps.globalStore);
+    return this.store.toViewData({
+      state: this.store.getState(),
+      props: this.props,
+      globalStore: this.deps.globalStore,
+    });
   }
 
   connectedCallback() {
-
     if (!this.renderTarget.parentNode) {
       this.appendChild(this.renderTarget);
     }
@@ -57,7 +107,7 @@ export class BaseComponent extends HTMLElement {
       refIds: this.refIds,
       getRefIds: () => this.refIds,
       dispatchEvent: this.dispatchEvent.bind(this),
-    }
+    };
 
     // TODO don't include onmount, subscriptions, etc in transformedHandlers
     Object.keys(this.handlers || {}).forEach((key) => {
@@ -68,9 +118,7 @@ export class BaseComponent extends HTMLElement {
     });
 
     if (this.handlers?.subscriptions) {
-      this.unsubscribeAll = subscribeAll(
-        this.handlers.subscriptions(deps)
-      );
+      this.unsubscribeAll = subscribeAll(this.handlers.subscriptions(deps));
     }
 
     if (this.handlers?.handleOnMount) {
@@ -108,10 +156,9 @@ export class BaseComponent extends HTMLElement {
         this.template,
         this.viewData,
         this.refs,
-        this.transformedHandlers
+        this.transformedHandlers,
+        this.propsSchema
       );
-
-      console.log('4444444444444 vDom', vDom)
 
       // parse through vDom and recursively find all elements with id
       const ids = {};
@@ -125,12 +172,11 @@ export class BaseComponent extends HTMLElement {
       };
       findIds(vDom);
       this.refIds = ids;
-      console.log('ids', ids)
 
       const parseTime = performance.now() - parseStart;
-      console.log(`parseView took ${parseTime.toFixed(2)}ms`);
+      // console.log(`parseView took ${parseTime.toFixed(2)}ms`);
 
-      console.log("vDom", vDom);
+      // console.log("vDom", vDom);
 
       const patchStart = performance.now();
       if (!this._oldVNode) {
@@ -147,14 +193,15 @@ export class BaseComponent extends HTMLElement {
 }
 
 export const createMyComponent = (
-  { handlers, template, createStore, refs, patch },
+  { handlers, template, createStore, refs, patch, propsSchema },
   deps
-  // { globalStore, subject, httpClient, BaseComponent }
 ) => {
   class MyComponent extends BaseComponent {
     constructor() {
       super();
-      this.store = createStore();
+      this.store = createStore(undefined, this.props);
+      this.propsSchema = propsSchema;
+      this.props = propsSchema? createProps(this, Object.keys(propsSchema.properties)) : {},
       this.template = template;
       this.handlers = handlers;
       this.refs = refs;
@@ -178,43 +225,53 @@ export const createMyComponent = (
  * @param {*} storeObj
  * @returns
  */
-export const transformStore = (storeObj) => {
-  return () => {
-    const { state: initialState, actions, selectors } = storeObj;
+export const transformStore = (createStore) => {
+  return (initialState, props) => {
+    const storeObj = createStore(undefined, props);
+    // return () => {
+      const { state, actions, selectors, toViewData } = storeObj;
 
-    // Create a mutable reference to the current state
-    let currentState = initialState;
+      // Create a mutable reference to the current state
+      let currentState = state;
 
-    // Create action handlers that update the current state
-    const transformedActions = Object.entries(actions).reduce(
-      (acc, [key, actionFn]) => {
-        acc[key] = (payload) => {
-          // Apply the action and get the new state
-          currentState = produce(currentState, (draft) => {
-            return actionFn(draft, payload);
-          });
+      // Create action handlers that update the current state
+      const transformedActions = Object.entries(actions).reduce(
+        (acc, [key, actionFn]) => {
+          acc[key] = (payload) => {
+            // Apply the action and get the new state
+            currentState = produce(currentState, (draft) => {
+              return actionFn(draft, payload);
+            });
 
-          // Return the new state (useful for chaining)
-          return currentState;
-        };
-        return acc;
-      },
-      {}
-    );
+            // Return the new state (useful for chaining)
+            return currentState;
+          };
+          return acc;
+        },
+        {}
+      );
 
-    // Create selector functions that use the current state
-    const transformedSelectors = Object.entries(selectors || {}).reduce(
-      (acc, [key, selectorFn]) => {
-        acc[key] = (...args) => selectorFn(currentState, ...args);
-        return acc;
-      },
-      {}
-    );
+      // Create selector functions that use the current state
+      const transformedSelectors = Object.entries(selectors || {}).reduce(
+        (acc, [key, selectorFn]) => {
+          acc[key] = (...args) => selectorFn({
+            state: currentState,
+            props,
+          }, ...args);
+          return acc;
+        },
+        {}
+      );
 
-    // Return the store API with actions and selectors
-    return {
-      ...transformedActions,
-      ...transformedSelectors,
-    };
+      // Return the store API with actions and selectors
+      return {
+        props,
+        getState: () => currentState,
+        state: currentState,
+        toViewData: storeObj.toViewData,
+        ...transformedActions,
+        ...transformedSelectors,
+      };
+    // };
   };
 };

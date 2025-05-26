@@ -7,30 +7,7 @@ const INITIAL_STATE = Object.freeze({
 
   // -2 means no target drag index
   targetDragIndex: -2,
-
   itemRects: {},
-
-  items: [{
-    id: '1',
-    name: 'Hello there',
-    level: 0
-  }, {
-    id: '2',
-    name: 'Wallo there',
-    level: 0
-  }, {
-    id: '3',
-    name: 'Ok there',
-    level: 1,
-  }, {
-    id: '4',
-    name: 'Ok there',
-    level: 1,
-  }, {
-    id: '5',
-    name: 'Ok there',
-    level: 2,
-  }]
 });
 
 const startDragging = (state, { id, itemRects }) => {
@@ -48,39 +25,43 @@ const stopDragging = (state) => {
 
 const setTargetDragIndex = (state, index) => {
   state.targetDragIndex = index;
+  console.log('setTargetDragIndex, state', state.targetDragIndex)
 }
 
-const selectTargetDragIndex = (state) => {
+const selectTargetDragIndex = ({ state, props }) => {
   return state.targetDragIndex;
 }
 
-const selectItemRects = (state) => {
+const selectItemRects = ({ state, props }) => {
   return state.itemRects;
 }
 
-const selectIsDragging = (state) => {
+const selectIsDragging = ({ state, props }) => {
   return state.isDragging;
 }
 
-const selectSelectedItemId = (state) => {
+const selectSelectedItemId = ({ state, props }) => {
   return state.selectedItemId;
 }
 
-const toViewData = (state) => {
-  console.log('state', state)
-  return state;
+const toViewData = ({ state, props}) => {
+  return {
+    ...state,
+    items: props.items || []
+  };
 }
 
-const createStore = (initialState = INITIAL_STATE) => {
+const createStore = (initialState = INITIAL_STATE, props) => {
   return {
+    props,
     state: {...initialState},
+    toViewData,
     actions: {
       startDragging,
       stopDragging,
       setTargetDragIndex,
     },
     selectors: {
-      toViewData,
       selectIsDragging,
       selectSelectedItemId,
       selectItemRects,
@@ -89,4 +70,4 @@ const createStore = (initialState = INITIAL_STATE) => {
   };
 };
 
-export default transformStore(createStore());
+export default transformStore(createStore);

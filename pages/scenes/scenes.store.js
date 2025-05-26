@@ -4,13 +4,14 @@ import { transformStore } from "../../framework.js";
 const INITIAL_STATE = Object.freeze({
 });
 
-const toViewData = (state) => {
+const toViewData = ({ state }) => {
   return state;
 }
 
-const createStore = (initialState = INITIAL_STATE) => {
+const createStore = (initialState = INITIAL_STATE, props) => {
   return {
-    state: {...initialState},
+    state: {...INITIAL_STATE},
+    props,
     actions: {
     },
     selectors: {
@@ -19,4 +20,4 @@ const createStore = (initialState = INITIAL_STATE) => {
   };
 };
 
-export default transformStore(createStore());
+export default transformStore(createStore);

@@ -4,8 +4,8 @@ const INITIAL_STATE = Object.freeze({
   currentRoute: "/projects",
 });
 
-const selectShowSidebar = (state) => {
-  const currentRoutePattern = selectCurrentRoutePattern(state);
+const selectShowSidebar = ({ state, props }) => {
+  const currentRoutePattern = selectCurrentRoutePattern({ state, props });
   const routesWithNavBar = [
     "/projects/:projectId",
     "/projects/:projectId/resources",
@@ -21,7 +21,7 @@ const selectShowSidebar = (state) => {
   return routesWithNavBar.includes(currentRoutePattern);
 };
 
-const selectCurrentRoutePattern = (state) => {
+const selectCurrentRoutePattern = ({ state, props }) => {
   const routePatterms = [
     "/projects",
     "/projects/:projectId",
@@ -57,16 +57,17 @@ const setCurrentRoute = (state, payload) => {
   return state;
 };
 
-const toViewData = (state) => {
+const toViewData = ({ state, props }) => {
   return {
     ...state,
-    currentRoutePattern: selectCurrentRoutePattern(state),
-    showSidebar: selectShowSidebar(state),
+    currentRoutePattern: selectCurrentRoutePattern({ state, props }),
+    showSidebar: selectShowSidebar({ state, props }),
   };
 };
 
-const createStore = (initialState = INITIAL_STATE) => {
+const createStore = (initialState = INITIAL_STATE, props) => {
   return {
+    props,
     state: {
       ...initialState,
     },
@@ -80,4 +81,4 @@ const createStore = (initialState = INITIAL_STATE) => {
   };
 };
 
-export default transformStore(createStore());
+export default transformStore(createStore);

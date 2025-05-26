@@ -11,12 +11,28 @@ dataSchema:
           type:
             type: string
 
+propsSchema:
+  type: object
+  properties:
+    items:
+      type: array
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+          id:
+            type: string
+          level:
+            type: number
+
 refs:
   item-*:
     eventListeners:
       mousedown:
         required: true
         handler: handleItemMouseDown
+
 template:
   - rtgl-view w=f h=100vh p=m w=200: 
     - rtgl-view w=f h=f g=s:

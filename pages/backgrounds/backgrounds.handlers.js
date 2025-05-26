@@ -1,8 +1,14 @@
 const handleOnMount = (deps) => {
 
+
 }
 const handleTargetChanged = (payload, deps) => {
-  console.log('received target changed', payload)
+  deps.store.addItem({
+    id: `df-${Date.now()}`,
+    name: 'sdf',
+    level: 1
+  })
+  deps.render();
 }
 
 export default {

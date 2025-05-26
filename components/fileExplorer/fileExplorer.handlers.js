@@ -1,5 +1,13 @@
 import { fromEvent, tap } from "rxjs";
 
+
+const handleOnMount = (deps) => {
+  // const { store } = deps;
+  // const { props, setItems } = store;
+  // const { items } = props;
+  // setItems(items)
+}
+
 /**
  *  we need to find the item that is under the mouse
  *  if mouse is above 1st item, return -1
@@ -64,6 +72,7 @@ const handleItemClick = (e, deps) => {
 const handleItemMouseDown = (e, deps) => {
   const { store, getRefIds } = deps;
   const refIds = getRefIds();
+  console.log('refIds', refIds)
 
   const itemRects = Object.keys(refIds).reduce((acc, key) => {
     const ref = refIds[key];
@@ -88,12 +97,12 @@ const handleWindowMouseUp = (e, deps) => {
 
   store.stopDragging();
 
-  render();
   dispatchEvent(new CustomEvent("targetchanged", {
     detail: {
       target: store.selectTargetDragIndex(),
     },
   }));
+  render();
 };
 
 const handleWindowMouseMove = (e, deps) => {
@@ -104,6 +113,8 @@ const handleWindowMouseMove = (e, deps) => {
   const itemRects = store.selectItemRects();
 
   const selectedItemIndex = getSelectedItemIndex(e.clientY, itemRects, -16);
+
+  console.log('selectedItemIndex', selectedItemIndex)
 
   if (store.selectTargetDragIndex() === selectedItemIndex) {
     return;
@@ -129,6 +140,7 @@ const subscriptions = (deps) => {
 };
 
 export default {
+  handleOnMount,
   handleItemClick,
   handleItemMouseDown,
   handleWindowMouseUp,

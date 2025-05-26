@@ -21,15 +21,16 @@ const INITIAL_STATE = Object.freeze({
   ],
 });
 
-const toViewData = (state) => {
+const toViewData = ({ state, props, globalState } ) => {
   return {
     ...state,
     itemsEncoded: encodeURIComponent(JSON.stringify(state.items)),
   };
 };
 
-const createStore = (initialState = INITIAL_STATE) => {
+const createStore = (initialState = INITIAL_STATE, props) => {
   return {
+    props,
     state: { ...initialState },
     actions: {
     },
@@ -39,4 +40,4 @@ const createStore = (initialState = INITIAL_STATE) => {
   };
 };
 
-export default transformStore(createStore());
+export default transformStore(createStore);

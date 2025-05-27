@@ -75,7 +75,7 @@ const INITIAL_STATE = Object.freeze({
   ],
 });
 
-const selectResourceRoute = (state, resourceId, projectId) => {
+const selectResourceRoute = ({ state }, resourceId, projectId) => {
   const resources = state.assets.concat(state.ui).concat(state.system);
   const resource = resources.find((resource) => resource.id === resourceId);
   if (!resource) {

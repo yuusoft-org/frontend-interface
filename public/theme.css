@@ -12,6 +12,12 @@ html {
 }
 
 
+[contenteditable] {
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+
 
 :root {
   --width-stretch: 100%;

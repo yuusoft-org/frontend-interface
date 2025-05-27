@@ -1,5 +1,8 @@
 import { createMyComponent, BaseComponent } from './framework.js'
 import { createAutoMergeData } from './automerge/sample.js'
+import stepsEditorAutomergeData from './automerge/sample3.js'
+
+import { createEditor } from "slate";
 
 import app from './pages/app/app.js'
 import projects from './pages/projects/projects.js'
@@ -12,6 +15,7 @@ import scenes from './pages/scenes/scenes.js';
 import sceneEditor from './pages/sceneEditor/sceneEditor.js';
 
 import fileExplorer from './components/fileExplorer/fileExplorer.js'
+import stepsEditor from './components/stepsEditor/stepsEditor.js'
 
 import { init } from 'snabbdom/build/init.js'
 import { classModule } from 'snabbdom/build/modules/class.js'
@@ -36,6 +40,27 @@ backgroundsData.createItem('_root', {
   level: 0
 })
 
+
+
+// const editor = createEditor();
+// editor.selection = {
+//   anchor: { path: [0, 0], offset: 0 },
+//   focus: { path: [0, 0], offset: 0 },
+// };
+// editor.children = [
+//   {
+//     id: "sdjlf3",
+//     type: "block",
+//     children: [{ text: "start" }],
+//   },
+//   {
+//     id: "39ksdf",
+//     type: "block",
+//     children: [{ text: "Line two" }],
+//   },
+// ];
+
+
 const deps = {
   globalStore: {},
   subject: new CustomSubject(),
@@ -43,8 +68,10 @@ const deps = {
   BaseComponent,
   router: new WebRouter(),
   localData: {
-    backgrounds: backgroundsData
-  }
+    backgrounds: backgroundsData,
+    'scene:1': stepsEditorAutomergeData(),
+  },
+  // editor
 }
 
 const createComponentFromPage = (page) => {
@@ -58,6 +85,11 @@ const createComponentFromPage = (page) => {
     handlers: page.handlers,
   }, deps)
 }
+
+const StepsEditorComponent = createComponentFromPage(stepsEditor)
+const FileExplorerComponent = createComponentFromPage(fileExplorer)
+customElements.define('file-explorer-component', FileExplorerComponent);
+customElements.define('steps-editor-component', StepsEditorComponent);
 
 const ProjectsComponent = createComponentFromPage(projects)
 const AppComponent = createComponentFromPage(app)
@@ -79,6 +111,4 @@ customElements.define('cgs-component', CgsComponent);
 customElements.define('scenes-component', ScenesComponent);
 customElements.define('scene-editor-component', SceneEditorComponent);
 
-const FileExplorerComponent = createComponentFromPage(fileExplorer)
-customElements.define('file-explorer-component', FileExplorerComponent);
 

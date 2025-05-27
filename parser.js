@@ -104,9 +104,9 @@ export const createVirtualDom = (
     return [h("div", {}, [])];
   }
 
-  function processItems(currentItems) {
+  function processItems(currentItems, parentPath = '') {
     return currentItems
-      .map((item) => {
+      .map((item, index) => {
         // Handle text nodes
         if (typeof item === "string" || typeof item === "number") {
           return String(item);
@@ -128,11 +128,11 @@ export const createVirtualDom = (
         // Skip numeric keys that might come from array indices
         if (!isNaN(Number(keyString))) {
           if (Array.isArray(value)) {
-            return processItems(value);
+            return processItems(value, `${parentPath}.${keyString}`);
           } else if (typeof value === "object" && value !== null) {
             const nestedEntries = Object.entries(value);
             if (nestedEntries.length > 0) {
-              return processItems([value]);
+              return processItems([value], `${parentPath}.${keyString}`);
             }
           }
           return String(value);
@@ -163,7 +163,7 @@ export const createVirtualDom = (
         const isWebComponent = tagName.includes("-");
 
         // 1. Parse attributes from attrsString
-        const attrs = Object.create(null); // Ensure attrs is always an object
+        const attrs = {}; // Ensure attrs is always an object
         const props = {};
         if (attrsString) {
           const attrRegex = /(\S+?)=(?:\"([^\"]*)\"|\'([^\']*)\'|(\S+))/g;
@@ -171,7 +171,8 @@ export const createVirtualDom = (
           while ((match = attrRegex.exec(attrsString)) !== null) {
             if (match[1].startsWith(".")) {
               const propName = match[1].substring(1);
-              props[propName] = lodashGet(data, propName)
+              const valuePathName = match[4];
+              props[propName] = lodashGet(data, valuePathName);
             } else {
               attrs[match[1]] = match[2] || match[3] || match[4];
             }
@@ -227,7 +228,7 @@ export const createVirtualDom = (
         if (typeof value === "string" || typeof value === "number") {
           childrenOrText = String(value);
         } else if (Array.isArray(value)) {
-          childrenOrText = processItems(value);
+          childrenOrText = processItems(value, `${parentPath}.${keyString}`);
         } else {
           childrenOrText = [];
         }
@@ -302,6 +303,22 @@ export const createVirtualDom = (
 
         // Create proper Snabbdom data object
         const snabbdomData = {};
+        
+        // Add key for better virtual DOM diffing
+        if (elementIdForRefs) {
+          snabbdomData.key = elementIdForRefs;
+        } else if (selector) {
+          // Generate a key based on selector, parent path, and index for list items
+          const itemPath = parentPath ? `${parentPath}.${index}` : String(index);
+          snabbdomData.key = `${selector}-${itemPath}`;
+          
+          // Include props in key if they exist for better change detection
+          if (Object.keys(props).length > 0) {
+            const propsHash = JSON.stringify(props).substring(0, 50); // Limit length
+            snabbdomData.key += `-${propsHash}`;
+          }
+        }
+        
         if (Object.keys(attrs).length > 0) {
           // This `attrs` object now correctly contains the intended 'id'
           snabbdomData.attrs = attrs;
@@ -315,6 +332,31 @@ export const createVirtualDom = (
         }
         if (Object.keys(props).length > 0) {
           snabbdomData.props = props;
+          
+          // For web components, add a hook to detect prop changes and set isDirty
+          if (isWebComponent) {
+            snabbdomData.hook = {
+              update: (oldVnode, vnode) => {
+                const oldProps = oldVnode.data?.props || {};
+                const newProps = vnode.data?.props || {};
+                
+                // Check if props have changed
+                const propsChanged = JSON.stringify(oldProps) !== JSON.stringify(newProps);
+                
+                if (propsChanged) {
+                  // Set isDirty attribute and trigger re-render
+                  const element = vnode.elm;
+                  if (element && element.render && typeof element.render === 'function') {
+                    element.setAttribute('isDirty', 'true');
+                    requestAnimationFrame(() => {
+                      element.render();
+                      element.removeAttribute('isDirty');
+                    });
+                  }
+                }
+              }
+            };
+          }
         }
 
         try {

@@ -1,9 +1,53 @@
 dataSchema:
   type: object
-  properties: {}
+  properties:
+    currentSteps:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+    currentInstructions:
+      type: array
+      items:
+        type: object
+        properties:
+          text:
+            type: string
+          id:
+            type: string
+          type:
+            type: string
+            enum:
+              - text
+              - image
 
-refs: {}
+refs:
+  steps-editor:
+    eventListeners:
+      editorDataChanaged:
+        handler: handleEditorDataChanaged
+      newLine:
+        handler: handleNewLine
+      moveUp:
+        handler: handleMoveUp
+      moveDown:
+        handler: handleMoveDown
 
 template:
   - rtgl-view w=f h=f p=m:
     - rtgl-text s=h2: Scene Editor
+    - rtgl-view d=h w=f h=f p=m:
+      - rtgl-view flex=1:
+        - steps-editor-component#steps-editor .steps=currentSteps:
+      - rtgl-view flex=1:
+        - rtgl-view h=300:
+          - rtgl-text s=h2: Preview Section
+        - rtgl-view w=f:
+          - rtgl-text s=h2: Instructions section
+          - rtgl-view g=m w=f:
+            - $map: { $eval: currentInstructions }
+              each(v,k):
+                - rtgl-view av=c ph=m bgc=mu h-bgc=ac h=32 w=f cur=p:
+                  - rtgl-svg svg=text wh=24:

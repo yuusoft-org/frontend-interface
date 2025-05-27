@@ -174,9 +174,9 @@ export class BaseComponent extends HTMLElement {
       this.refIds = ids;
 
       const parseTime = performance.now() - parseStart;
-      // console.log(`parseView took ${parseTime.toFixed(2)}ms`);
+      console.log(`parseView took ${parseTime.toFixed(2)}ms`);
 
-      // console.log("vDom", vDom);
+      console.log("vDom", vDom);
 
       const patchStart = performance.now();
       if (!this._oldVNode) {
@@ -199,9 +199,9 @@ export const createMyComponent = (
   class MyComponent extends BaseComponent {
     constructor() {
       super();
-      this.store = createStore(undefined, this.props);
       this.propsSchema = propsSchema;
-      this.props = propsSchema? createProps(this, Object.keys(propsSchema.properties)) : {},
+      this.props = propsSchema ? createProps(this, Object.keys(propsSchema.properties)) : {};
+      this.store = createStore(undefined, this.props);
       this.template = template;
       this.handlers = handlers;
       this.refs = refs;

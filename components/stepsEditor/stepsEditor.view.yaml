@@ -38,11 +38,11 @@ template:
     - rtgl-view w=f h=f p=m:
       - $map: { $eval: steps }
         each(v,k):
-          - rtgl-view d=h:
+          - rtgl-view d=h w=f:
             - $switch:
                 'selectedStepId == v.id':
                   - rtgl-view h=40 w=2 bgc=ac mr=m:
                 'selectedStepId != v.id':
                   - rtgl-view h=40 w=2 mr=m:
-            - div#step-${v.id} contenteditable=true:
+            - 'div#step-${v.id} style="width: 100%;" contenteditable=true':
               - 'span style="font-size: 36px;"': Test Data

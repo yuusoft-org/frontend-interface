@@ -2,8 +2,6 @@ import { createMyComponent, BaseComponent } from './framework.js'
 import { createAutoMergeData } from './automerge/sample.js'
 import stepsEditorAutomergeData from './automerge/sample3.js'
 
-import { createEditor } from "slate";
-
 import app from './pages/app/app.js'
 import projects from './pages/projects/projects.js'
 import project from './pages/project/project.js'
@@ -16,6 +14,8 @@ import sceneEditor from './pages/sceneEditor/sceneEditor.js';
 
 import fileExplorer from './components/fileExplorer/fileExplorer.js'
 import stepsEditor from './components/stepsEditor/stepsEditor.js'
+import commandLineActions from './components/commandLineActions/commandLineActions.js'
+import commandLineBackground from './components/commandLineBackground/commandLineBackground.js'
 
 import { init } from 'snabbdom/build/init.js'
 import { classModule } from 'snabbdom/build/modules/class.js'
@@ -39,27 +39,6 @@ backgroundsData.createItem('_root', {
   name: 'Initial Item',
   level: 0
 })
-
-
-
-// const editor = createEditor();
-// editor.selection = {
-//   anchor: { path: [0, 0], offset: 0 },
-//   focus: { path: [0, 0], offset: 0 },
-// };
-// editor.children = [
-//   {
-//     id: "sdjlf3",
-//     type: "block",
-//     children: [{ text: "start" }],
-//   },
-//   {
-//     id: "39ksdf",
-//     type: "block",
-//     children: [{ text: "Line two" }],
-//   },
-// ];
-
 
 const deps = {
   globalStore: {},
@@ -88,8 +67,12 @@ const createComponentFromPage = (page) => {
 
 const StepsEditorComponent = createComponentFromPage(stepsEditor)
 const FileExplorerComponent = createComponentFromPage(fileExplorer)
+const CommandLineActionsComponent = createComponentFromPage(commandLineActions)
+const CommandLineBackgroundComponent = createComponentFromPage(commandLineBackground)
 customElements.define('file-explorer-component', FileExplorerComponent);
 customElements.define('steps-editor-component', StepsEditorComponent);
+customElements.define('command-line-actions-component', CommandLineActionsComponent);
+customElements.define('command-line-background-component', CommandLineBackgroundComponent);
 
 const ProjectsComponent = createComponentFromPage(projects)
 const AppComponent = createComponentFromPage(app)

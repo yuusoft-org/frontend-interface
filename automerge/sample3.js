@@ -45,7 +45,12 @@ import { nanoid } from "nanoid";
 const stepsEditorAutomergeData = () => {
   let doc = Automerge.from({
       steps: [{
-        id: 'kjalf31'
+        id: 'kjalf31',
+        presentation: {
+          background: {
+            backgroundId: 'file:f4xajkl2'
+          }
+        }
       }]
     })
   /**

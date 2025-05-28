@@ -10,27 +10,35 @@ const handleStepKeyDown = (e, deps) => {
   let newOffset;
   switch (e.key) {
     case "Enter":
-      e.preventDefault()
-      dispatchEvent(new CustomEvent("newLine", {
-        detail: {
-          // editor: editor,
-        },
-      }));
+      e.preventDefault();
+      requestAnimationFrame(() => {
+        dispatchEvent(
+          new CustomEvent("newLine", {
+            detail: {
+              // editor: editor,
+            },
+          })
+        );
+      });
     case "ArrowUp":
-      e.preventDefault()
-      dispatchEvent(new CustomEvent("moveUp", {
-        detail: {
-          stepId: e.currentTarget.id.replace(/^step-/, ''),
-        },
-      }));
+      e.preventDefault();
+      dispatchEvent(
+        new CustomEvent("moveUp", {
+          detail: {
+            stepId: e.currentTarget.id.replace(/^step-/, ""),
+          },
+        })
+      );
       break;
     case "ArrowDown":
-      e.preventDefault()
-      dispatchEvent(new CustomEvent("moveDown", {
-        detail: {
-          stepId: e.currentTarget.id.replace(/^step-/, ''),
-        },
-      }));
+      e.preventDefault();
+      dispatchEvent(
+        new CustomEvent("moveDown", {
+          detail: {
+            stepId: e.currentTarget.id.replace(/^step-/, ""),
+          },
+        })
+      );
       break;
     // case "ArrowRight":
     //   e.preventDefault();
@@ -56,7 +64,7 @@ const handleStepKeyDown = (e, deps) => {
   // blockRef.setAttribute('spellcheck', 'false');
 
   // requestAnimationFrame(() => {
-    // deps.render();
+  // deps.render();
   // })
 
   // setTimeout(() => {
@@ -106,7 +114,7 @@ const handleBlockBeforeInput = (e, deps) => {
   // Skip insertion during IME composition
   // if (isComposing) return
 
-  console.log('e.data', e.data)
+  console.log("e.data", e.data);
 
   if (e.data) {
     Transforms.insertText(editor, e.data);
@@ -114,7 +122,7 @@ const handleBlockBeforeInput = (e, deps) => {
     store.setEditorSelection(editor.selection);
     render();
     // requestAnimationFrame(() => {
-      deps.handlers.updateSelection(e.currentTarget.id, deps);
+    deps.handlers.updateSelection(e.currentTarget.id, deps);
     // })
   }
 };
@@ -123,12 +131,14 @@ const handleOnInput = (e, deps) => {
   return;
   const { editor } = deps;
   const { dispatchEvent } = deps;
-  dispatchEvent(new CustomEvent("editorDataChanaged", {
-    detail: {
-      editor: editor,
-    },
-  }));
-}
+  dispatchEvent(
+    new CustomEvent("editorDataChanaged", {
+      detail: {
+        editor: editor,
+      },
+    })
+  );
+};
 
 const updateSelection = (id, deps) => {
   return;
@@ -142,8 +152,8 @@ const updateSelection = (id, deps) => {
   const selection = window.getSelection();
   if (selection) {
     // requestAnimationFrame(() => {
-      selection.removeAllRanges();
-      selection.addRange(range);
+    selection.removeAllRanges();
+    selection.addRange(range);
     // })
 
     // Focus the element
@@ -153,21 +163,21 @@ const updateSelection = (id, deps) => {
 
 const updateSelectedStep = (stepId, deps) => {
   const { store, getRefIds } = deps;
-  console.log('getRefIds()', getRefIds())
-  const stepRef = getRefIds()[`step-${stepId}`]
-  console.log('stepRef', stepRef)
+  console.log("getRefIds()", getRefIds());
+  const stepRef = getRefIds()[`step-${stepId}`];
+  console.log("stepRef", stepRef);
   stepRef.elm.focus();
   // store.setSelectedStepIndex(index);
-}
+};
 
 const handleOnFocus = (e, deps) => {
-  console.log('focus', e)
+  console.log("focus", e);
   const { store, render } = deps;
-  const stepId = e.currentTarget.id.replace(/^step-/, '');
-  console.log('stepId', stepId)
+  const stepId = e.currentTarget.id.replace(/^step-/, "");
+  console.log("stepId", stepId);
   store.setSelectedStepId(stepId);
   render();
-}
+};
 
 export default {
   handleStepKeyDown,
